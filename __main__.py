@@ -10,7 +10,7 @@ def run():
         PIP_RUN_RETENTION_STRATEGY='persist',
         PYTEST_ADDOPTS='--doctest-modules --import-mode importlib',
     )
-    with pip_run.deps.load('.[testing]') as home:
+    with pip_run.deps.load('.[test]') as home:
         sys.path.insert(0, str(home))
         runpy.run_module('pytest', run_name='__main__')
 
