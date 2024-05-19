@@ -1,4 +1,4 @@
-Run tests for projects under the [Coherent Software Development System](https://blog.jaraco.com/vision-for-scalable-OSS-development/).
+Run tests for projects under the [Coherent Software Development System](https://github.com/coherent-oss/system/blob/main/README.md).
 
 ```
 py -m coherent.test
