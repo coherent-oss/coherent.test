@@ -8,7 +8,7 @@ from coherent.build import bootstrap
 
 def run():
     os.environ.update(
-        PYTEST_ADDOPTS='--doctest-modules --import-mode importlib',
+        PYTEST_ADDOPTS='--import-mode importlib',
     )
     with bootstrap.write_pyproject(), pip_run.deps.load('.[test]') as home:
         sys.path.insert(0, str(home))
