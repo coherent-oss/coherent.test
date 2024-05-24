@@ -8,7 +8,6 @@ from coherent.build import bootstrap
 
 def run():
     os.environ.update(
-        PIP_RUN_RETENTION_STRATEGY='persist',
         PYTEST_ADDOPTS='--doctest-modules --import-mode importlib',
     )
     with bootstrap.write_pyproject(), pip_run.deps.load('.[test]') as home:
