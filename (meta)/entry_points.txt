@@ -1,0 +1,2 @@
+[pytest11]
+coherent-monkey-patch = coherent.test.monkey
