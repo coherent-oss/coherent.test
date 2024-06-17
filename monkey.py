@@ -19,14 +19,9 @@ def import_path(
     """
     rel_path = pathlib.Path(path).relative_to(root).with_suffix('')
     rel_name = '.'.join(rel_path.parts)
-    try:
-        # import from the essential package
-        return importlib.import_module(
-            f"{best_name()}.{rel_name}".removesuffix('.__init__')
-        )
-    except ImportError:
-        # fall back to imports from '.' (e.g. tests/test_something.py)
-        return importlib.import_module(rel_name)
+    return importlib.import_module(
+        f"{best_name()}.{rel_name}".removesuffix('.__init__')
+    )
 
 
 def patch_all():
