@@ -10,7 +10,9 @@ def run():
     os.environ.update(
         PYTEST_ADDOPTS='--doctest-modules',
     )
-    with bootstrap.write_pyproject(), pip_run.deps.load('.[test]') as home:
+    with bootstrap.write_pyproject(), pip_run.deps.load(
+        '--editable', '.[test]'
+    ) as home:
         sys.path.insert(0, str(home))
         runpy.run_module('pytest', run_name='__main__')
 
