@@ -3,20 +3,20 @@ from __future__ import annotations
 import functools
 import importlib
 import pathlib
-import types
 from typing import TYPE_CHECKING
 
 from coherent.build import discovery
 
 if TYPE_CHECKING:
     from _typeshed import StrPath
+    from types import ModuleType
 
 best_name = functools.cache(discovery.best_name)
 
 
 def import_path(
     path: StrPath, *, root: pathlib.Path, **unused_kwargs
-) -> types.ModuleType:
+) -> ModuleType:
     """
     Import the given path relative to the root.
 
