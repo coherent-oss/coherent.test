@@ -1,22 +1,20 @@
 from __future__ import annotations
 
-import functools
 import importlib
 import pathlib
 from typing import TYPE_CHECKING
 
+from jaraco.compat.py38 import r_fix, cache
 from coherent.build import discovery
 
 if TYPE_CHECKING:
     from _typeshed import StrPath
     from types import ModuleType
 
-best_name = functools.lru_cache(maxsize=None)(discovery.best_name)
+best_name = cache(discovery.best_name)
 
 
-def import_path(
-    path: StrPath, *, root: pathlib.Path, **unused_kwargs
-) -> ModuleType:
+def import_path(path: StrPath, *, root: pathlib.Path, **unused_kwargs) -> ModuleType:
     """
     Import the given path relative to the root.
 
@@ -24,10 +22,9 @@ def import_path(
     """
     rel_path = pathlib.Path(path).relative_to(root).with_suffix('')
     rel_name = '.'.join(rel_path.parts)
-    module_name = f"{best_name()}.{rel_name}"
-    if module_name.endswith(init_module := ".__init__"):
-        module_name = module_name[:-len(init_module)]
-    return importlib.import_module(module_name)
+    return importlib.import_module(
+        r_fix(f"{best_name()}.{rel_name}").removesuffix('.__init__')
+    )
 
 
 def patch_all():
