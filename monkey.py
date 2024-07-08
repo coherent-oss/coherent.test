@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from _typeshed import StrPath
     from types import ModuleType
 
-best_name = functools.cache(discovery.best_name)
+best_name = functools.lru_cache(maxsize=None)(discovery.best_name)
 
 
 def import_path(
@@ -24,9 +24,10 @@ def import_path(
     """
     rel_path = pathlib.Path(path).relative_to(root).with_suffix('')
     rel_name = '.'.join(rel_path.parts)
-    return importlib.import_module(
-        f"{best_name()}.{rel_name}".removesuffix('.__init__')
-    )
+    module_name = f"{best_name()}.{rel_name}"
+    if module_name.endswith(init_module := ".__init__"):
+        module_name = module_name[:-len(init_module)]
+    return importlib.import_module(module_name)
 
 
 def patch_all():
