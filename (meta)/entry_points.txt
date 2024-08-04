@@ -1,2 +1,5 @@
 [pytest11]
 coherent-monkey-patch = coherent.test.monkey
+
+[pipx.run]
+coherent.cli = coherent.test.__main__:run
