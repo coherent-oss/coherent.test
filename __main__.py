@@ -3,6 +3,8 @@ import os
 import runpy
 import sys
 
+from . import modules
+
 import pip_run
 from coherent.build import bootstrap
 
@@ -23,6 +25,7 @@ def run():
         PYTEST_ADDOPTS='--doctest-modules',
     )
     with project_on_path():
+        modules.restore()
         runpy.run_module('pytest', run_name='__main__')
 
 
