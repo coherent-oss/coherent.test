@@ -12,3 +12,7 @@ on:
 jobs:
   main:
     uses: coherent-oss/system/.github/workflows/main.yml@main
+    permissions:
+      contents: write
+    secrets:
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
