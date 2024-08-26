@@ -24,6 +24,7 @@ def build_env(target, *, orig=os.environ):
             orig.get('PYTHONPATH', ''), os.fspath(target)
         ),
         PYTEST_ADDOPTS='--doctest-modules',
+        PYTHONSAFEPATH='1',
     )
     return {**orig, **overlay}
 
