@@ -1,7 +1,9 @@
 import contextlib
 import os
+import pathlib
 import subprocess
 import sys
+import urllib.request
 
 import pip_run.deps
 import pip_run.launch
@@ -29,13 +31,24 @@ def build_env(target, *, orig=os.environ):
     return {**orig, **overlay}
 
 
+def load_ruff_toml():
+    url = 'https://raw.githubusercontent.com/jaraco/skeleton/refs/heads/main/ruff.toml'
+    return urllib.request.urlopen(url).read().decode('utf-8')
+
+
+def configure_ruff():
+    if pathlib.Path('(meta)/ruff.toml').exists():
+        raise NotImplementedError
+    return bootstrap.assured(pathlib.Path('ruff.toml'), load_ruff_toml)
+
+
 @contextlib.contextmanager
 def project_on_path():
     """
     Install the project under test and yield its new install path.
     """
     deps = pip_run.deps.load('--editable', '.[test]')
-    with bootstrap.write_pyproject(), deps as home:
+    with bootstrap.write_pyproject(), deps as home, configure_ruff():
         yield home
 
 

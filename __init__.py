@@ -7,4 +7,6 @@ A trivial doctest to cause something to be tested.
 
 __requires__ = [
     'pytest',
+    'pytest-enabler',
+    'pytest-ruff',
 ]
