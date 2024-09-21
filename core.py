@@ -37,6 +37,12 @@ def load_ruff_toml():
 
 
 def configure_ruff():
+    """
+    >>> getfixture('monkeypatch').chdir(getfixture('tmp_path'))
+    >>> with configure_ruff():
+    ...     pathlib.Path('ruff.toml').stat().st_size > 0
+    True
+    """
     if pathlib.Path('(meta)/ruff.toml').exists():
         raise NotImplementedError
     return bootstrap.assured(pathlib.Path('ruff.toml'), load_ruff_toml)
