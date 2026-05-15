@@ -64,8 +64,8 @@ def emit_installed_packages():
 
     >>> import unittest.mock
     >>> with unittest.mock.patch.dict(os.environ, {'CI': '1'}):
-    ...     emit_installed_packages()  # doctest: +ELLIPSIS
-    installed:...
+    ...     emit_installed_packages()
+    installed: ...coherent.test==...
     """
     if not os.environ.get('CI'):
         return
