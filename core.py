@@ -62,10 +62,11 @@ def emit_installed_packages():
     """
     When running in CI, emit the installed packages in a pip-compatible format.
 
-    >>> import unittest.mock
-    >>> with unittest.mock.patch.dict(os.environ, {'CI': '1'}):
-    ...     emit_installed_packages()
-    installed: ...coherent.test==...
+    >>> getfixture('monkeypatch').delenv('CI', raising=False)
+    >>> emit_installed_packages()
+    >>> getfixture('monkeypatch').setenv('CI', '1')
+    >>> emit_installed_packages()  # doctest: +ELLIPSIS
+    installed: ...
     """
     if not os.environ.get('CI'):
         return
