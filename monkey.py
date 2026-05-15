@@ -4,12 +4,13 @@ import importlib
 import pathlib
 from typing import TYPE_CHECKING
 
-from jaraco.compat.py38 import r_fix, cache
 from coherent.build import discovery
+from jaraco.compat.py38 import cache, r_fix
 
 if TYPE_CHECKING:
-    from _typeshed import StrPath
     from types import ModuleType
+
+    from _typeshed import StrPath
 
 best_name = cache(discovery.best_name)
 
