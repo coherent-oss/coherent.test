@@ -73,9 +73,8 @@ def emit_installed_packages(home):
         [sys.executable, '-m', 'pip', 'list', '--path', str(home), '--format=freeze'],
         capture_output=True,
         text=True,
+        check=True,
     )
-    if result.returncode != 0:
-        return
     packages = ' '.join(result.stdout.splitlines())
     print('installed:', packages)
 
