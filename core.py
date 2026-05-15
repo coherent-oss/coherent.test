@@ -1,10 +1,12 @@
 import contextlib
+import functools
 import os
 import pathlib
 import subprocess
 import sys
 import urllib.request
 
+import jaraco.functools
 import pip_run.deps
 import pip_run.launch
 from coherent.build import bootstrap
@@ -58,8 +60,30 @@ def project_on_path():
         yield home
 
 
+@jaraco.functools.bypass_unless(functools.partial(os.environ.get, 'CI'))
+def emit_installed_packages(_=None):
+    """
+    When running in CI, emit the installed packages in a pip-compatible format.
+
+    >>> getfixture('monkeypatch').delenv('CI', raising=False)
+    >>> emit_installed_packages(None)
+    >>> getfixture('monkeypatch').setenv('CI', '1')
+    >>> emit_installed_packages(None)  # doctest: +ELLIPSIS
+    installed: ...
+    """
+    result = subprocess.run(
+        [sys.executable, '-m', 'pip', 'list', '--format=freeze'],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    packages = ' '.join(result.stdout.splitlines())
+    print('installed:', packages)
+
+
 def run():
     with project_on_path() as home:
+        emit_installed_packages(None)
         cmd = [sys.executable, '-m', 'pytest', *sys.argv[1:]]
         proc = subprocess.Popen(cmd, env=build_env(home))
         raise SystemExit(proc.wait())
