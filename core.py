@@ -58,19 +58,19 @@ def project_on_path():
         yield home
 
 
-def emit_installed_packages(home):
+def emit_installed_packages():
     """
     When running in CI, emit the installed packages in a pip-compatible format.
 
     >>> import unittest.mock
     >>> with unittest.mock.patch.dict(os.environ, {'CI': '1'}):
-    ...     emit_installed_packages(getfixture('tmp_path'))  # doctest: +ELLIPSIS
+    ...     emit_installed_packages()  # doctest: +ELLIPSIS
     installed:...
     """
     if not os.environ.get('CI'):
         return
     result = subprocess.run(
-        [sys.executable, '-m', 'pip', 'list', '--path', str(home), '--format=freeze'],
+        [sys.executable, '-m', 'pip', 'list', '--format=freeze'],
         capture_output=True,
         text=True,
         check=True,
@@ -81,7 +81,7 @@ def emit_installed_packages(home):
 
 def run():
     with project_on_path() as home:
-        emit_installed_packages(home)
+        emit_installed_packages()
         cmd = [sys.executable, '-m', 'pytest', *sys.argv[1:]]
         proc = subprocess.Popen(cmd, env=build_env(home))
         raise SystemExit(proc.wait())
