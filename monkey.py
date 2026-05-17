@@ -28,12 +28,37 @@ def import_path(path: StrPath, *, root: pathlib.Path, **unused_kwargs) -> Module
     )
 
 
-def patch_all():
+def patch_mypy():
+    import mypy.find_sources
+
+    def crawl_up_dir(self, dir: str) -> tuple[str, str]:
+        """
+        Honor essential layout in mypy SourceFinder.
+        """
+        if pathlib.Path().samefile(dir):
+            return best_name(), dir
+        return super().crawl_up_dir(dir)
+
+    EssentialFinder = type(
+        'EssentialFinder',
+        (mypy.find_sources.SourceFinder,),
+        dict(crawl_up_dir=crawl_up_dir),
+    )
+
+    mypy.find_sources.SourceFinder = EssentialFinder
+
+
+def patch_pytest():
     import _pytest.config
     import _pytest.python
 
     _pytest.config.import_path = import_path
     _pytest.python.import_path = import_path
+
+
+def patch_all():
+    patch_pytest()
+    patch_mypy()
 
 
 def pytest_configure():
