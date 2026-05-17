@@ -33,21 +33,25 @@ def build_env(target, *, orig=os.environ):
     return {**orig, **overlay}
 
 
-def load_ruff_toml():
-    url = 'https://raw.githubusercontent.com/jaraco/skeleton/refs/heads/main/ruff.toml'
+def load_skeleton_file(name):
+    url = f'https://raw.githubusercontent.com/jaraco/skeleton/refs/heads/main/{name}'
     return urllib.request.urlopen(url).read().decode('utf-8')
 
 
-def configure_ruff():
+def configure(name):
     """
     >>> getfixture('monkeypatch').chdir(getfixture('tmp_path'))
-    >>> with configure_ruff():
+    >>> with configure('ruff.toml'):
     ...     pathlib.Path('ruff.toml').stat().st_size > 0
     True
     """
-    if pathlib.Path('(meta)/ruff.toml').exists():
+    if pathlib.Path(f'(meta)/{name}').exists():
+        # for future, consider honoring this file
         raise NotImplementedError
-    return bootstrap.assured(pathlib.Path('ruff.toml'), load_ruff_toml)
+    return bootstrap.assured(
+        pathlib.Path(name),
+        functools.partial(load_skeleton_file, name),
+    )
 
 
 @contextlib.contextmanager
@@ -56,7 +60,12 @@ def project_on_path():
     Install the project under test and yield its new install path.
     """
     deps = pip_run.deps.load('--editable', '.[test]')
-    with bootstrap.write_pyproject(), deps as home, configure_ruff():
+    with (
+        bootstrap.write_pyproject(),
+        deps as home,
+        configure('ruff.toml'),
+        configure('mypy.ini'),
+    ):
         yield home
 
 

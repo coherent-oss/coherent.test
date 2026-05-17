@@ -9,4 +9,5 @@ __requires__ = [
     'pytest',
     'pytest-enabler',
     'pytest-ruff',
+    'pytest-mypy',
 ]
