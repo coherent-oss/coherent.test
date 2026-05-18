@@ -4,8 +4,9 @@ import importlib
 import pathlib
 from typing import TYPE_CHECKING
 
-from coherent.build import discovery
+from coherent.build import discovery  # type: ignore[import-untyped]
 from jaraco.compat.py38 import cache, r_fix
+from jaraco.context import suppress
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -28,12 +29,33 @@ def import_path(path: StrPath, *, root: pathlib.Path, **unused_kwargs) -> Module
     )
 
 
-def patch_all():
+@suppress(ImportError)
+def patch_mypy():
+    import mypy.find_sources  # type: ignore[import-not-found]
+
+    class EssentialFinder(mypy.find_sources.SourceFinder):
+        def crawl_up_dir(self, dir: str) -> tuple[str, str]:
+            """
+            Honor essential layout in mypy SourceFinder.
+            """
+            if pathlib.Path().samefile(dir):
+                return best_name(), dir
+            return super().crawl_up_dir(dir)
+
+    mypy.find_sources.SourceFinder = EssentialFinder
+
+
+def patch_pytest():
     import _pytest.config
     import _pytest.python
 
     _pytest.config.import_path = import_path
     _pytest.python.import_path = import_path
+
+
+def patch_all():
+    patch_pytest()
+    patch_mypy()
 
 
 def pytest_configure():
