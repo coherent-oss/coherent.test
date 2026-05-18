@@ -7,9 +7,9 @@ import sys
 import urllib.request
 
 import jaraco.functools
-import pip_run.deps
-import pip_run.launch
-from coherent.build import bootstrap
+import pip_run.deps  # type: ignore[import-untyped]
+import pip_run.launch  # type: ignore[import-untyped]
+from coherent.build import bootstrap  # type: ignore[import-untyped]
 
 
 def build_env(target, *, orig=os.environ):
