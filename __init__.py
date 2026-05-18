@@ -9,5 +9,6 @@ __requires__ = [
     'pytest',
     'pytest-enabler',
     'pytest-ruff',
-    'pytest-mypy',
+    # Exclude PyPy from type checks (python/mypy#20454 jaraco/skeleton#187)
+    "pytest-mypy; platform_python_implementation != 'PyPy'",
 ]

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from coherent.build import discovery  # type: ignore[import-untyped]
 from jaraco.compat.py38 import cache, r_fix
+from jaraco.context import suppress
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -28,6 +29,7 @@ def import_path(path: StrPath, *, root: pathlib.Path, **unused_kwargs) -> Module
     )
 
 
+@suppress(ImportError)
 def patch_mypy():
     import mypy.find_sources  # type: ignore[import-not-found]
 
