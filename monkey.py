@@ -31,19 +31,14 @@ def import_path(path: StrPath, *, root: pathlib.Path, **unused_kwargs) -> Module
 def patch_mypy():
     import mypy.find_sources
 
-    def crawl_up_dir(self, dir: str) -> tuple[str, str]:
-        """
-        Honor essential layout in mypy SourceFinder.
-        """
-        if pathlib.Path().samefile(dir):
-            return best_name(), dir
-        return super().crawl_up_dir(dir)
-
-    EssentialFinder = type(
-        'EssentialFinder',
-        (mypy.find_sources.SourceFinder,),
-        dict(crawl_up_dir=crawl_up_dir),
-    )
+    class EssentialFinder(mypy.find_sources.SourceFinder):
+        def crawl_up_dir(self, dir: str) -> tuple[str, str]:
+            """
+            Honor essential layout in mypy SourceFinder.
+            """
+            if pathlib.Path().samefile(dir):
+                return best_name(), dir
+            return super().crawl_up_dir(dir)
 
     mypy.find_sources.SourceFinder = EssentialFinder
 
