@@ -31,7 +31,7 @@ def import_path(path: StrPath, *, root: pathlib.Path, **unused_kwargs) -> Module
 
 @suppress(ImportError)
 def patch_mypy():
-    import mypy.find_sources  # type: ignore[import-not-found]
+    import mypy.find_sources
 
     class EssentialFinder(mypy.find_sources.SourceFinder):
         def crawl_up_dir(self, dir: str) -> tuple[str, str]:

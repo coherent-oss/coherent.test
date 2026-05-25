@@ -10,5 +10,6 @@ __requires__ = [
     'pytest-enabler',
     'pytest-ruff',
     # Exclude PyPy from type checks (python/mypy#20454 jaraco/skeleton#187)
-    "pytest-mypy; platform_python_implementation != 'PyPy'",
+    # disabled for coherent-oss/coherent.test#23
+    # "pytest-mypy; platform_python_implementation != 'PyPy'",
 ]
