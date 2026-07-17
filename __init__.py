@@ -5,6 +5,8 @@ A trivial doctest to cause something to be tested.
 'coherent.test'
 """
 
+__license__ = 'Apache-2.0'
+
 __requires__ = [
     'pytest',
     'pytest-enabler',
