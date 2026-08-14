@@ -1,5 +1,6 @@
 import contextlib
 import functools
+import importlib.metadata
 import os
 import pathlib
 import subprocess
@@ -74,19 +75,22 @@ def emit_installed_packages(_=None):
     """
     When running in CI, emit the installed packages in a pip-compatible format.
 
+    Uses importlib.metadata rather than shelling out to pip, so it works
+    in environments that supply no pip (e.g. a uv-provisioned env under
+    ``uvx``). See coherent-oss/coherent.test#26.
+
     >>> getfixture('monkeypatch').delenv('CI', raising=False)
     >>> emit_installed_packages(None)
     >>> getfixture('monkeypatch').setenv('CI', '1')
     >>> emit_installed_packages(None)  # doctest: +ELLIPSIS
     installed: ...
     """
-    result = subprocess.run(
-        [sys.executable, '-m', 'pip', 'list', '--format=freeze'],
-        capture_output=True,
-        text=True,
-        check=True,
+    packages = ' '.join(
+        sorted(
+            f'{dist.name}=={dist.version}'
+            for dist in importlib.metadata.distributions()
+        )
     )
-    packages = ' '.join(result.stdout.splitlines())
     print('installed:', packages)
 
 
