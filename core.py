@@ -7,6 +7,10 @@ import subprocess
 import sys
 import urllib.request
 
+# Honor PYTHONSAFEPATH on Python 3.10 (a no-op there) before importing
+# pip_run et al., so a cwd module can't shadow a stdlib import. Must sort
+# ahead of pip_run/coherent.build; see coherent-oss/system (3.10 shadow).
+import jaraco.compat.py310.safe_path
 import jaraco.functools
 import pip_run.deps  # type: ignore[import-untyped]
 import pip_run.launch  # type: ignore[import-untyped]
@@ -94,9 +98,27 @@ def emit_installed_packages(_=None):
     print('installed:', packages)
 
 
+def pytest_command(*args):
+    """
+    Build the command to run pytest with a safe path.
+
+    On 3.11+, PYTHONSAFEPATH (set by build_env) keeps the cwd off sys.path.
+    Python 3.10 ignores PYTHONSAFEPATH, and isolated mode (-I) would also
+    drop PYTHONPATH (which build_env relies on), so instead strip the cwd
+    in-process — via the compat shim's import side effect — before importing
+    pytest, so a cwd module can't shadow a stdlib import.
+    """
+    if sys.version_info >= (3, 11):
+        return [sys.executable, '-m', 'pytest', *args]
+    bootstrap = (
+        'import jaraco.compat.py310.safe_path, sys;'
+        ' from pytest import console_main; sys.exit(console_main())'
+    )
+    return [sys.executable, '-c', bootstrap, *args]
+
+
 def run():
     with project_on_path() as home:
         emit_installed_packages(None)
-        cmd = [sys.executable, '-m', 'pytest', *sys.argv[1:]]
-        proc = subprocess.Popen(cmd, env=build_env(home))
+        proc = subprocess.Popen(pytest_command(*sys.argv[1:]), env=build_env(home))
         raise SystemExit(proc.wait())
